@@ -5,21 +5,18 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"willianszwy/FC-Cloud-Run/internal/interfaces"
 )
-
-type HTTPClient interface {
-	Do(req *http.Request) (*http.Response, error)
-}
 
 type City struct {
 	Name string `json:"localidade"`
 }
 
 type ViaCep struct {
-	client HTTPClient
+	client interfaces.HTTPClient
 }
 
-func New(client HTTPClient) *ViaCep {
+func New(client interfaces.HTTPClient) *ViaCep {
 	return &ViaCep{
 		client: client,
 	}
