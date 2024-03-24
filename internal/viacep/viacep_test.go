@@ -111,3 +111,23 @@ func TestFindByZipCode_UnMarshallError(t *testing.T) {
 	assert.NotNil(t, err)
 	assert.Equal(t, expectedError, err.Error())
 }
+
+func TestFindByZipCode_EmptyCityError(t *testing.T) {
+	const expectedError = "error city notfound"
+	json := ` {
+      "localidade": ""
+    }`
+	body := io.NopCloser(bytes.NewReader([]byte(json)))
+	client := ClientMock{
+		Res: &http.Response{Body: body, StatusCode: 200},
+	}
+	viaCep := New(&client)
+	assert.NotNil(t, viaCep)
+
+	city, err := viaCep.FindByZipCode(context.TODO(), "00000-000")
+
+	assert.Equal(t, City{}, city)
+	assert.Equal(t, "", city.Name)
+	assert.NotNil(t, err)
+	assert.Equal(t, expectedError, err.Error())
+}

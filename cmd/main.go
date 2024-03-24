@@ -7,6 +7,8 @@ import (
 	"net/http"
 	"willianszwy/FC-Cloud-Run/configs"
 	"willianszwy/FC-Cloud-Run/internal/handlers"
+	"willianszwy/FC-Cloud-Run/internal/viacep"
+	"willianszwy/FC-Cloud-Run/internal/weather"
 )
 
 func main() {
@@ -18,7 +20,12 @@ func main() {
 	log.Println("Load config...")
 	r := chi.NewRouter()
 	r.Use(middleware.Logger)
-	r.Get("/temperature", handlers.GetTemperature(config, http.DefaultClient))
+
+	viaCepClient := viacep.New(http.DefaultClient)
+	weatherClient := weather.New(http.DefaultClient, config.WeatherAPIKey)
+	temperatureHandler := handlers.New(viaCepClient, weatherClient)
+
+	r.Get("/temperature", temperatureHandler.Handler)
 
 	http.ListenAndServe(":8080", r)
 }
