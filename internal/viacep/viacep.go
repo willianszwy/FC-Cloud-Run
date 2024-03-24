@@ -37,5 +37,8 @@ func (vc *ViaCep) FindByZipCode(ctx context.Context, zipCode string) (City, erro
 	if err != nil {
 		return City{}, fmt.Errorf("error deconding request %w", err)
 	}
+	if city.Name == "" {
+		return City{}, fmt.Errorf("error city notfound")
+	}
 	return city, nil
 }

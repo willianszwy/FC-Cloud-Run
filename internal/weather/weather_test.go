@@ -76,7 +76,7 @@ func TestFindTempByCity(t *testing.T) {
 }
 
 func TestFindTempByCity_NewRequestError(t *testing.T) {
-	const expectedError = "error creating request net/http: nil Context"
+	const expectedError = "FindTempByCity : error creating request net/http: nil Context"
 	json := ` {
     "current": {
         "temp_c": 18.0,
@@ -109,11 +109,11 @@ func TestFindTempByCity_DoError(t *testing.T) {
 
 	assert.Equal(t, Response{}, temp)
 	assert.NotNil(t, err)
-	assert.Equal(t, "error doing request error", err.Error())
+	assert.Equal(t, "FindTempByCity: error doing request error", err.Error())
 }
 
 func TestFindTempByCity_UnMarshallError(t *testing.T) {
-	const expectedError = "error deconding request json: cannot unmarshal string into Go struct field .current.temp_c of type float64"
+	const expectedError = "FindTempByCity: error deconding request json: cannot unmarshal string into Go struct field .current.temp_c of type float64"
 	json := ` {
     "current": {
         "temp_c": "teste",

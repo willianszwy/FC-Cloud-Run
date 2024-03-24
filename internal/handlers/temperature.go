@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"regexp"
 	"willianszwy/FC-Cloud-Run/configs"
 	"willianszwy/FC-Cloud-Run/internal/interfaces"
 	"willianszwy/FC-Cloud-Run/internal/temperature"
@@ -22,15 +23,24 @@ func GetTemperature(config *configs.Config, httpClient interfaces.HTTPClient) fu
 		zipcode := request.URL.Query().Get("zipcode")
 		log.Println(fmt.Sprintf("[zipcode:%s]", zipcode))
 
+		regex := regexp.MustCompile("^[0-9]{8}$")
+		if !regex.MatchString(zipcode) {
+			writer.WriteHeader(http.StatusUnprocessableEntity)
+			http.Error(writer, "invalid zipCode", http.StatusUnprocessableEntity)
+			return
+		}
+
 		city, err := viaCepClient.FindByZipCode(request.Context(), zipcode)
 		if err != nil {
-			writer.WriteHeader(http.StatusInternalServerError)
-			http.Error(writer, err.Error(), http.StatusInternalServerError)
+			log.Println("error", err.Error())
+			writer.WriteHeader(http.StatusNotFound)
+			http.Error(writer, "can not find zipcode", http.StatusNotFound)
 			return
 		}
 
 		tempByCity, err := weatherClient.FindTempByCity(request.Context(), city.Name)
 		if err != nil {
+			log.Println("error", err.Error())
 			writer.WriteHeader(http.StatusInternalServerError)
 			http.Error(writer, err.Error(), http.StatusInternalServerError)
 			return

@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"net/http"
+	"net/url"
 	"willianszwy/FC-Cloud-Run/internal/interfaces"
 )
 
@@ -26,7 +27,8 @@ func New(client interfaces.HTTPClient, apikey string) *Weather {
 }
 
 func (w *Weather) FindTempByCity(ctx context.Context, city string) (Response, error) {
-	url := fmt.Sprintf("https://api.weatherapi.com/v1/current.json?key=%s&q=%s", w.Apikey, city)
+	log.Println("city:", city)
+	url := fmt.Sprintf("https://api.weatherapi.com/v1/current.json?key=%s&q=%s", w.Apikey, url.QueryEscape(city))
 	log.Println("find temp by city url", url)
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
