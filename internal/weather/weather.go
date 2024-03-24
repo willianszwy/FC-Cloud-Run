@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"willianszwy/FC-Cloud-Run/internal/interfaces"
 )
@@ -26,19 +27,21 @@ func New(client interfaces.HTTPClient, apikey string) *Weather {
 
 func (w *Weather) FindTempByCity(ctx context.Context, city string) (Response, error) {
 	url := fmt.Sprintf("https://api.weatherapi.com/v1/current.json?key=%s&q=%s", w.Apikey, city)
+	log.Println("find temp by city url", url)
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, url, nil)
 	if err != nil {
-		return Response{}, fmt.Errorf("error creating request %w", err)
+		return Response{}, fmt.Errorf("FindTempByCity : error creating request %w", err)
 	}
 	resp, err := w.client.Do(req)
 	if err != nil {
-		return Response{}, fmt.Errorf("error doing request %w", err)
+		return Response{}, fmt.Errorf("FindTempByCity: error doing request %w", err)
 	}
 	defer resp.Body.Close()
 	var weatherResponse Response
 	err = json.NewDecoder(resp.Body).Decode(&weatherResponse)
 	if err != nil {
-		return Response{}, fmt.Errorf("error deconding request %w", err)
+		log.Println("error aqui", err.Error())
+		return Response{}, fmt.Errorf("FindTempByCity: error deconding request %w", err)
 	}
 	return weatherResponse, nil
 }
