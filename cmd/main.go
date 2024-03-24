@@ -13,7 +13,7 @@ import (
 
 func main() {
 
-	config, err := configs.LoadConfig("../")
+	config, err := configs.LoadConfig("")
 	if err != nil {
 		panic(err)
 	}
